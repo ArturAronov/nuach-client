@@ -2,6 +2,7 @@ export default function Home() {
   return (
     <main>
       <div className="flex gap-5">
+        <button>default button</button>
         <button className="button-primary">primary button</button>
         <button className="button-secondary">secondary button</button>
         <button className="button-neutral">neutral button</button>
