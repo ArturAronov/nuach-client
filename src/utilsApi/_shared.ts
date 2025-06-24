@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 const TOKEN_NAME = "nuach";
 
 type fetchT = {
-  method: "get" | "post" | "patch";
+  method: "get" | "post";
   isCached: boolean;
   route: string;
 };
@@ -13,28 +13,27 @@ export const getRootUrl = () => {
   const prodUrl = process.env.PROD_SERVER_URL;
   const env = process.env.NEXT_PUBLIC_NUACH_ENV;
 
+  if (!devUrl) throw Error("Can't find env DEV_SERVER_URL");
+  if (!prodUrl) throw Error("Can't find env PROD_SERVER_URL");
+
+  console.log(devUrl);
+
   return env?.toLowerCase() === "dev" ? devUrl : prodUrl;
 };
 
-export const fetchConfig = async (props: fetchT) => {
+export const fetchConfig = async (props: fetchT): Promise<RequestInit> => {
   const { method, route, isCached } = props;
-
-  const securityUser = process.env.SECURITY_USER;
-  const securityPassword = process.env.SECURITY_PASSWORD;
-
   const cacheKey = `${method}-${route}`;
   const cookieStore = await cookies();
   const nuachToken = cookieStore.get(TOKEN_NAME)?.value;
 
   return {
     mode: "cors",
-    method: method.toUpperCase(),
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Credentials": "true",
       Origin: getRootUrl(),
-      Authorization: `Basic ${btoa(`${securityUser}:${securityPassword}`)}`,
       ...(nuachToken && { Cookie: `${TOKEN_NAME}=${nuachToken}` }),
     },
     ...(isCached && {
