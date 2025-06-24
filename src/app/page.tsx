@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppForm, withForm } from "@/forms/utils";
+import { postPrompt } from "@/utilsApi/postPrompt";
 import { formOptions } from "@tanstack/react-form";
 // import { z } from "zod";
 
@@ -9,16 +10,21 @@ const formOpt = formOptions({
     source: "",
     prompt: "",
   },
-  // validators: {
-  //   onSubmitAsync: async ({ value }: { value: signInT }) => {
-  //     try {
-  //       return await postSignIn(value);
-  //     } catch (error) {
-  //       console.error("Submission error:", error);
-  //       return "Form submission failed. Please try again.";
-  //     }
-  //   },
-  // },
+  validators: {
+    onSubmitAsync: async ({
+      value,
+    }: {
+      value: { source: string; prompt: string };
+    }) => {
+      console.log(value);
+      try {
+        return await postPrompt(value.prompt);
+      } catch (error) {
+        console.error("Submission error:", error);
+        return "Form submission failed. Please try again.";
+      }
+    },
+  },
 });
 
 const HomeForm = withForm({
@@ -38,7 +44,11 @@ const HomeForm = withForm({
         </form.AppField> */}
         <form.AppField name="prompt">
           {(field) => (
-            <field.TextAreaField placeholder="dssdf" label="Prompt" />
+            <field.TextAreaField
+              onChange={(e) => form.setFieldValue("prompt", e.target.value)}
+              placeholder="dssdf"
+              label="Prompt"
+            />
           )}
         </form.AppField>
         <form.AppForm>
