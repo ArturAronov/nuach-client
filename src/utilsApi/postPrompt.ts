@@ -2,26 +2,28 @@
 
 import { fetchConfig, getRootUrl } from "./_shared";
 
-export type signInT = {
-  email: string;
-  password: string;
-};
-
-// export const postSignIn = cache(async (body: signInT): Promise<void | null> => {
-export const postPrompt = async (body: signInT): Promise<void | null> => {
-  console.log("Sending postPrompt: ", body);
+export const postPrompt = async (prompt: string): Promise<string | null> => {
+  console.log("Sending postPrompt: ", prompt);
 
   try {
-    const route = "/v1/request-question";
+    const route = "/v1/quiz/request-question";
     const url = getRootUrl() + route;
-    const response = await fetch(url, {
-      ...fetchConfig({ method: "post", isCached: false, route: route }),
+    const fetchObj = await fetchConfig({
       method: "post",
-      body: JSON.stringify(body),
+      isCached: false,
+      route: route,
     });
 
-    console.log(response);
-    // return response;
+    const response = await fetch(url, {
+      ...fetchObj,
+      body: JSON.stringify({
+        prompt,
+        stream: false,
+        model: "llama3.2",
+      }),
+    }).then((res) => res.text());
+
+    return response;
   } catch (err) {
     console.error("Error in postPrompt: ", err);
     return null;
