@@ -16,8 +16,6 @@ export const getRootUrl = () => {
   if (!devUrl) throw Error("Can't find env DEV_SERVER_URL");
   if (!prodUrl) throw Error("Can't find env PROD_SERVER_URL");
 
-  console.log(devUrl);
-
   return env?.toLowerCase() === "dev" ? devUrl : prodUrl;
 };
 

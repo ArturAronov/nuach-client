@@ -16,7 +16,6 @@ const formOpt = formOptions({
     }: {
       value: { source: string; prompt: string };
     }) => {
-      console.log(value);
       try {
         return await postPrompt(value.prompt);
       } catch (error) {
