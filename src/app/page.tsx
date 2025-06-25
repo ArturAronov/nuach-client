@@ -1,6 +1,6 @@
 "use client";
 
-import { postPrompt } from "@/utilsApi/postPrompt";
+import { postPrompt } from "@/utilsApi/getPrompt";
 import { formOptions } from "@tanstack/react-form";
 import { useAppForm, withForm } from "@/forms/utils";
 
