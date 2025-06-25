@@ -9,18 +9,13 @@ export const postPrompt = async (prompt: string): Promise<string | null> => {
     const route = "/v1/quiz/request-question";
     const url = getRootUrl() + route;
     const fetchObj = await fetchConfig({
-      method: "post",
+      method: "get",
       isCached: false,
       route: route,
     });
 
-    const response = await fetch(url, {
+    const response = await fetch(`${url}/?query=${prompt}`, {
       ...fetchObj,
-      body: JSON.stringify({
-        prompt,
-        stream: false,
-        model: "llama3.2",
-      }),
     }).then((res) => res.text());
 
     return response;
