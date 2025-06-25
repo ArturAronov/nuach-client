@@ -28,6 +28,7 @@ export const fetchConfig = async (props: fetchT): Promise<RequestInit> => {
   return {
     mode: "cors",
     credentials: "include",
+    method: method.toUpperCase(),
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Credentials": "true",
