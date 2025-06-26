@@ -2,7 +2,9 @@
 
 import { fetchConfig, getRootUrl } from "./_shared";
 
-export const postPrompt = async (prompt: string): Promise<string | null> => {
+export const postPrompt = async (
+  prompt: string,
+): Promise<Record<"question" | "error", string> | null> => {
   console.log("Sending postPrompt: ", prompt);
 
   try {
@@ -16,7 +18,9 @@ export const postPrompt = async (prompt: string): Promise<string | null> => {
 
     const response = await fetch(`${url}/?query=${prompt}`, {
       ...fetchObj,
-    }).then((res) => res.text());
+    })
+      .then((res) => res.text())
+      .then((text) => JSON.parse(text));
 
     return response;
   } catch (err) {
