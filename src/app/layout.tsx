@@ -1,6 +1,6 @@
+import "./globals.css";
 import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
-import "./globals.css";
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -18,8 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="container flex flex-col justify-center">
-      <body className={`${ibmPlexMono.className} antialiased`}>{children}</body>
+    <html lang="en" className="w-screen flex flex-col items-center sm:pt-20">
+      <body className={`${ibmPlexMono.className} max-w-80 antialiased `}>
+        {children}
+      </body>
     </html>
   );
 }
