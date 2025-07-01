@@ -4,9 +4,12 @@ import { useStudyTopic } from "@/hooks/useStudyTopic";
 import { useAppForm, withForm } from "@/forms/utils";
 import { formOptions } from "@tanstack/react-form";
 import { postPrompt } from "@/utilsApi/getPrompt";
+import { postAnswer } from "@/utilsApi/postAnswer";
 
-let outputDisplay = "";
-let outputError = "";
+let recievedQuestion = "";
+let promptResponse = "";
+let promtScore = "";
+let promptError = "";
 
 const studyTopicFormOpt = formOptions({
   defaultValues: {
@@ -14,14 +17,18 @@ const studyTopicFormOpt = formOptions({
     question: "",
   },
   validators: {
-    onSubmitAsync: async ({ value }: { value: { topic: string } }) => {
+    onSubmitAsync: async ({
+      value,
+    }: {
+      value: { topic: string; question: string };
+    }) => {
       try {
-        outputDisplay = "";
-        outputError = "";
+        recievedQuestion = "";
+        promptError = "";
 
         const output = await postPrompt(value.topic);
-        if (output?.question) outputDisplay = output.question;
-        else if (output?.error) outputError = output.error;
+        if (output?.question) recievedQuestion = output.question;
+        else if (output?.error) promptError = output.error;
       } catch (error) {
         console.error("Submission error:", error);
         return "Form submission failed. Please try again.";
@@ -42,8 +49,15 @@ const answerFormOpt = formOptions({
       value: { answer: string; topic: string };
     }) => {
       try {
-        // await postAnswer(value);
-        console.log(value);
+        const output = await postAnswer({
+          ...value,
+          question: recievedQuestion,
+        });
+
+        if (output?.question) recievedQuestion = output.question;
+        if (output?.feedback) promptResponse = output.feedback;
+        if (output?.outcome) promtScore = output.outcome;
+        if (output?.error) promptError = output.error;
       } catch (error) {
         console.error("Submission error:", error);
         return "Form submission failed. Please try again.";
@@ -62,7 +76,6 @@ const CombinedForms = withForm({
       <div className="space-y-8">
         <div>
           <form
-            className="flex gap-5"
             onSubmit={(e) => {
               e.preventDefault();
               studyTopicForm.handleSubmit();
@@ -75,6 +88,7 @@ const CombinedForms = withForm({
                   onChange={(e) =>
                     studyTopicForm.setFieldValue("topic", e.target.value)
                   }
+                  className="w-80"
                   label="Generate study topic"
                 />
               )}
@@ -82,19 +96,20 @@ const CombinedForms = withForm({
             <studyTopicForm.AppForm>
               <studyTopicForm.SubmitButton
                 label="Generate"
-                className="pt-6 text-center button-primary"
+                className="pt-2"
+                btnStyle="text-center button-primary"
               />
             </studyTopicForm.AppForm>
           </form>
-          <p className="text-red-800 text-sm font-bold">{outputError}</p>
-          <p>{outputDisplay}</p>
+          <p className="text-red-800 text-sm font-bold">{promptError}</p>
+          <p className="pt-3">{recievedQuestion}</p>
         </div>
 
         <div>
           <form
-            className="flex gap-5"
             onSubmit={(e) => {
               if (!studyTopicStore) return null;
+              console.log("studyTopicStore ", studyTopicStore);
               answerForm.setFieldValue("topic", studyTopicStore);
 
               e.preventDefault();
@@ -108,16 +123,30 @@ const CombinedForms = withForm({
                     answerForm.setFieldValue("answer", e.target.value)
                   }
                   label="Answer"
+                  className="w-80 sm:h-80 h-60"
                 />
               )}
             </answerForm.AppField>
             <answerForm.AppForm>
               <answerForm.SubmitButton
                 label="Submit Answer"
-                className="pt-6 text-center button-secondary"
+                className="pt-2"
+                btnStyle="text-center button-secondary"
               />
             </answerForm.AppForm>
           </form>
+          <div className="font-bold pt-3">
+            {promptResponse && (
+              <span
+                className={
+                  promtScore === "pass" ? "text-green-600" : "text-red-600"
+                }
+              >
+                {promtScore === "pass" ? "Correct: " : "Incorrect: "}
+              </span>
+            )}
+            <span>{promptResponse}</span>
+          </div>
         </div>
       </div>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import { TextareaHTMLAttributes } from "react";
+import { HTMLAttributes, TextareaHTMLAttributes } from "react";
 import { useFieldContext, useFormContext } from "./utils";
 
 export const TextField = ({
@@ -58,15 +58,16 @@ export const TextAreaField = ({
 
 export const SubmitButton = ({
   label,
-  className,
+  btnStyle,
+  ...rest
 }: {
   label: string;
-  className?: string;
-}) => {
+  btnStyle?: string;
+} & HTMLAttributes<HTMLDivElement>) => {
   const form = useFormContext();
 
   return (
-    <div className={className ? className : ""}>
+    <div {...rest}>
       <form.Subscribe
         selector={(state) => [state.isSubmitting, state.canSubmit]}
       >
@@ -74,6 +75,7 @@ export const SubmitButton = ({
           <button
             type="submit"
             title={label}
+            className={btnStyle ? btnStyle : ""}
             disabled={isSubmitting || !canSubmit}
           >
             {isSubmitting ? "Submitting..." : label}

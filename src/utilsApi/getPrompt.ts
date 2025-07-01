@@ -13,7 +13,7 @@ export const postPrompt = async (
     const fetchObj = await fetchConfig({
       method: "get",
       isCached: false,
-      route: route,
+      route,
     });
 
     const response = await fetch(`${url}/?query=${prompt}`, {
